@@ -1,0 +1,12 @@
+dep
+dict
+obj
+*.C
+*Dict.cc
+*Dict.h
+*.o
+*.d
+bin
+slib
+lib
+*.gif

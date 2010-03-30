@@ -55,7 +55,7 @@ CXX       := g++
 CXXFLAGS  += -Wall -fPIC $(ROOTCFLAGS)
 LD        := g++
 LDFLAGS   := $(ROOTLDFLAGS)
-SOFLAGS   := -Wl,-soname,$(notdir $@) -shared
+SOFLAGS   := -Wl,-soname,$$(notdir $$@) -shared
 ObjSuf    := o
 SrcSuf    := cc
 ExeSuf    :=
@@ -68,13 +68,13 @@ CXX       := g++
 CXXFLAGS  += -Wall -fPIC $(ROOTCFLAGS)
 LD        := g++
 LDFLAGS   := $(ROOTLDFLAGS)
-SOFLAGS   := -O2 -dynamiclib -single_module -undefined dynamic_lookup -install_name $@ 
+SOFLAGS   := -O2 -dynamiclib -single_module -undefined dynamic_lookup -install_name $$@ 
 ObjSuf    := o
 SrcSuf    := cc
 ExeSuf    :=
 DllSuf    := dylib
 OutPutOpt := -o
-POST_LINK_COMMAND := ln -fs $$(@) $$(subst .dylib,.so,$$(@))
+POST_LINK_COMMAND := ln -fs $(CLASTOOL)/$$(@) $(CLASTOOL)/$$(subst .dylib,.so,$$(@))
 endif
 
 

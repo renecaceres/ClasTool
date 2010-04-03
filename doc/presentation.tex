@@ -1,0 +1,66 @@
+\documentclass[11pt]{beamer}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphics}                                
+\usepackage{listings}
+\usepackage{array}
+\usepackage{times}
+
+
+\usetheme{CambridgeUS}
+\usecolortheme{seagull}
+\usefonttheme[onlylarge]{structurebold}
+
+\lstset{%
+     showstringspaces = false,
+     basicstyle=\small\ttfamily,
+   }
+
+\lstdefinestyle{Pascal}
+   {language=Pascal,
+   }
+
+\author{Sebasti\'an Mancilla}
+\date{\today}
+\title{ClasTool Makefile}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
+\begin{document}
+\begin{frame}
+	\begin{center}
+		\begin{tabular*}{\textwidth}%
+      {>{\centering}m{0.1\textwidth}@{\extracolsep{\fill}}>{\centering}m{3in}%
+      >{\centering}m{0.1\textwidth}}
+			\includegraphics[height=0.09\textwidth]{usm} &
+		  \textsc{\scriptsize{Universidad T\'ecnica Federico Santa Mar\'ia\\
+      Departamento de F\'isica}\\
+      \footnotesize{UTFSM ATLAS Grid Team}} &
+			\includegraphics[height=0.1\textwidth]{root} 
+		\end{tabular*}
+
+    \vspace{1.4cm}
+    \large{\textbf{Nonrecursive Makefile for ClasTool}}
+
+    \vspace{0.8cm}
+    \normalsize{Sebasti\'an Mancilla Matta}\\
+    \url{smancill@alumnos.inf.utfsm.cl}
+	\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Recursive Makefile issues}
+  Recursive makefiles are bad primarily because they partition the dependency
+  tree into several trees.
+  
+  \begin{itemize}
+    \item This prevents dependencies between make instances from being
+      expressed correctly.
+    \item Also causes (parts of) the dependency tree to be recalculated
+      multiple times, which is a performance issue in the end.
+  \end{itemize}
+\end{frame}
+
+\end{document}

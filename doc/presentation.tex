@@ -63,4 +63,50 @@
   \end{itemize}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{ROOT}
+  \begin{itemize}
+    \item The ROOT Makefile itself was structured as described in the paper:
+      ``Recursive Make Considered Harmful''.\\[5mm]
+    \item The main philosophy is that it is better to have a single large
+      Makefile describing the entire project than many small Makefiles, one
+      for each sub-project, that are recursively called from the main
+      Makefile. By cleverly using the include mechanism the single Makefile
+      solution is as modular as the recursive approach without the problems of
+      incomplete dependency graphs.\\[5mm]
+    \item The single Makefile is fast
+      \begin{itemize}
+        \item About 1 second to check if anything needs to be recompiled.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{My approach}
+  Three main files in the project root directory:
+
+  \begin{itemize}
+    \item \texttt{Makefile\_system:} it has all the system-dependent variables
+      definitions used.\\[2mm]
+    \item \texttt{Makefile:} the project's non-recursive Makefile.\\[2mm]
+    \item \texttt{Makefile\_templates:} it has all the templates to build the
+      specific rules for every directory, and the macros used by
+      \texttt{module.mk} files. 
+  \end{itemize}
+  
+  \vspace{3mm}
+  A \texttt{module.mk} file in every directory for building the libraries.
+
+  \begin{itemize}
+    \item All this files are included in the main Makefile.\\[2mm]
+    \item All share the same structure.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \end{document}

@@ -1,7 +1,7 @@
 \documentclass[11pt]{beamer}
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{graphics}                                
+\usepackage{graphics}
 \usepackage{listings}
 \usepackage{array}
 \usepackage{times}
@@ -16,28 +16,25 @@
      basicstyle=\small\ttfamily,
    }
 
-\lstdefinestyle{Pascal}
-   {language=Pascal,
-   }
-
 \author{Sebasti\'an Mancilla}
+\institute[UTFSM]{Universidad T\écnica Federico Santa Mar\ía}
 \date{\today}
 \title{ClasTool Makefile}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 \begin{frame}
-	\begin{center}
-		\begin{tabular*}{\textwidth}%
+  \begin{center}
+    \begin{tabular*}{\textwidth}%
       {>{\centering}m{0.1\textwidth}@{\extracolsep{\fill}}>{\centering}m{3in}%
       >{\centering}m{0.1\textwidth}}
-			\includegraphics[height=0.09\textwidth]{usm} &
-		  \textsc{\scriptsize{Universidad T\'ecnica Federico Santa Mar\'ia\\
+      \includegraphics[height=0.09\textwidth]{usm} &
+      \textsc{\scriptsize{Universidad T\'ecnica Federico Santa Mar\'ia\\
       Departamento de F\'isica}\\
       \footnotesize{UTFSM ATLAS Grid Team}} &
-			\includegraphics[height=0.1\textwidth]{root} 
-		\end{tabular*}
+      \includegraphics[height=0.1\textwidth]{root}
+    \end{tabular*}
 
     \vspace{1.4cm}
     \large{\textbf{Nonrecursive Makefile for ClasTool}}
@@ -45,7 +42,7 @@
     \vspace{0.8cm}
     \normalsize{Sebasti\'an Mancilla Matta}\\
     \url{smancill@alumnos.inf.utfsm.cl}
-	\end{center}
+  \end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,22 +51,71 @@
   \frametitle{Recursive Makefile issues}
   Recursive makefiles are bad primarily because they partition the dependency
   tree into several trees.
-  
+
   \begin{itemize}
     \item This prevents dependencies between make instances from being
-      expressed correctly.
+      expressed correctly.\\[2mm]
     \item Also causes (parts of) the dependency tree to be recalculated
       multiple times, which is a performance issue in the end.
+  \end{itemize}
+
+  \vspace{5mm}
+  This affects both phases of the operation of make:
+
+  \begin{itemize}
+    \item It causes make to construct an inaccurate DAG.\\[2mm]
+    \item It forces make to traverse the DAG in an inappropriate order.
   \end{itemize}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
+  \frametitle{Recursive Makefile issues}
+  Other problems include:
+
+  \begin{itemize}
+    \item Recursive makes which take \emph{forever} to work out that they need
+      to do nothing.\\[2mm]
+    \item Recursive makes which do too much, or too little.\\[2mm]
+    \item Recursive makes which are overly sensitive to changes in the source
+      code and require constant Makefile intervention to keep them
+      working.\\[2mm]
+    \item It is very hard to get the order of the recursion into the
+      sub-directories correct.\\[2mm]
+    \item It is often necessary to do more than one pass over the
+      sub-directories to build the whole system.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Nonrecursive Makefiles}
+  \begin{itemize}
+    \item The use of a whole project make is not as difficult to put into
+      practice as it may at first appear.\\[5mm]
+    \item It solves the problems found in the recursive make approach.
+
+      \begin{itemize}
+      \item It handles dependencies correctly. Treating the whole tree as a
+        single entity is really the right way.\\[1mm]
+      \item Specific targets can be built (say a particular program)
+        correctly, since make always creates a full dependency graph.\\[1mm]
+      \item It is faster.\\[5mm]
+      \end{itemize}
+    \item It requires a paradigm shift for developers used to recursive
+      make.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
   \frametitle{ROOT}
   \begin{itemize}
-    \item The ROOT Makefile itself was structured as described in the paper:
-      ``Recursive Make Considered Harmful''.\\[5mm]
+    \item The ROOT Makefile itself was structured as described in the paper
+      \emph{Recursive Make Considered Harmful}.\\[5mm]
     \item The main philosophy is that it is better to have a single large
       Makefile describing the entire project than many small Makefiles, one
       for each sub-project, that are recursively called from the main
@@ -92,12 +138,12 @@
   \begin{itemize}
     \item \texttt{Makefile\_system:} it has all the system-dependent variables
       definitions used.\\[2mm]
-    \item \texttt{Makefile:} the project's non-recursive Makefile.\\[2mm]
+    \item \texttt{Makefile:} the project's nonrecursive Makefile.\\[2mm]
     \item \texttt{Makefile\_templates:} it has all the templates to build the
-      specific rules for every directory, and the macros used by
+      specific rules for every directory, and the macros used by the
       \texttt{module.mk} files. 
   \end{itemize}
-  
+
   \vspace{3mm}
   A \texttt{module.mk} file in every directory for building the libraries.
 
@@ -105,6 +151,23 @@
     \item All this files are included in the main Makefile.\\[2mm]
     \item All share the same structure.
   \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[t]
+  \frametitle{References}
+
+  \begin{thebibliography}{99}
+    \bibitem {RMH} \emph{Recursive Make Considered Harmful}, Peter Miller,
+      1997\\
+      \url{http://miller.emu.id.au/pmiller/books/rmch/}\\[7mm]
+    \bibitem {MPM} \emph{Managing Projects with GNU make}, 3rd Edition, Robert
+      Mecklenburg, 2004\\
+      \url{http://www.makelinux.net/make3/main.html}\\[7mm]
+    \bibitem {GIT} My Git repository (here you can find the sources)\\
+      \url{http://github.com/smancill/ClasTool_Makefile}
+  \end{thebibliography}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

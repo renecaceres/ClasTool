@@ -40,7 +40,156 @@
   \end{center}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Makefiles and make command}
+
+  \textbf{make} is a utility intended to automate and optimize the
+  construction of programs.
+
+  \vspace{3mm}
+
+  A descriptor file named \texttt{Makefile} describes the relationship among
+  source files and provides commands for updating each file. 
+
+  \pause
+  \vspace{2mm}
+  \begin{itemize}[<+->]
+    \item \textbf{make} invokes \texttt{Makefile} to automatically rebuild a
+      program whenever one of the source files is modified.\\[2mm]
+    \item It only recompiles the files that were affected by changes, thus
+      saving compiling time.\\[2mm]
+    \item This helps reduce the likelihood of human errors when making entries
+      from the command line.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\lstset{%
+     showstringspaces = false,
+     basicstyle=\small\ttfamily,
+   }
+
+\begin{frame}[t,fragile]
+  \frametitle{Makefiles and make command}
+  \framesubtitle{Example}
+
+  The executable \texttt{project1} is built from the following sources files:
+
+  \vspace{5mm}
+  \begin{lstlisting}[language=make]
+         project
+           |
+           |_ main.c
+           |_ data.h
+           |_ data.c
+           |_ io.h
+           |_ io.c
+  \end{lstlisting}
+
+  \vspace{5mm}
+  The source \texttt{main.c} includes \texttt{data.h} and
+  \texttt{io.h}.
+
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Makefiles and make command}
+  \framesubtitle{Example}
+
+  The following tree shows the dependencies between files:
+
+  \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{depgraph}
+  \end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Makefiles and make command}
+  \framesubtitle{Example}
+
+  And this is a simple \texttt{Makefile} to build the executable:
+
+  \vspace{5mm}
+  \begin{lstlisting}[language=make, frame=single]
+    project1: main.o data.o io.o
+            gcc main.o data.o io.o -o project1
+
+    main.o: data.h io.h main.c
+            gcc -c main.c
+
+    data.o: data.c data.h
+            gcc -c data.c
+
+    io.o: io.h io.c
+            cc -c io.c
+  \end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Makefiles and make command}
+  \framesubtitle{Example}
+
+  \small{
+  \begin{itemize}[<+->]
+    \item \textbf{make} runs the rule for first target \texttt{project1} and
+      figures its dependencies on \texttt{data.o}, \texttt{main.o} and
+      \texttt{io.o}.
+    \item \textbf{make} next checks if any of the three object files are
+      listed as targets. If yes, it runs the rule for first prerequisite, that
+      is, \texttt{main.o}, to find its dependencies.
+    \item \textbf{make} checks whether the prerequisites of \texttt{main.o}
+      have further dependencies. If not, as in the example, it checks if
+      \texttt{main.o} is up to date. If not, it runs the command for
+      \texttt{main.o} by compiling \texttt{main.c} to get the object file.
+    \item \textbf{make} looks at the targets \texttt{data.o} and \texttt{io.o}
+      and compiles these object files in a similar fashion.
+    \item \textbf{make} returns to first target \texttt{project1}. As it now
+      has all up-to-date object files for the rule, it executes the command to
+      build \texttt{project1}.
+  \end{itemize}
+  }
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Recursive and nonrecursive Makefiles}
+
+  \small{
+  Traditionally the software development projects use a hierarchy of
+  directories containing source files for the modules which make up the
+  project.
+  
+  \vspace{2mm}
+  \begin{itemize}[<+->]
+    \item In the \textbf{recursive make} method each of the sub-directories
+      contains a \texttt{Makefile} which describes the rules and instructions
+      for the \textbf{make} program.
+
+      The complete project build is done by arranging for the top-level
+      \texttt{Makefile} to change directory into each of the sub-directories
+      and recursively invoke \textbf{make}.\\[4mm]
+
+    \item A \textbf{nonrecursive make} uses one single top-level
+      \texttt{Makefile} to build the project and one \emph{make include file}
+      for each sub-directory containing file lists and module-specific rules.
+  \end{itemize}
+  }
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Recursive Makefile issues}
@@ -54,12 +203,13 @@
       multiple times, which is a performance issue in the end.
   \end{itemize}
 
+  \pause
   \vspace{5mm}
   This affects both phases of the operation of make:
 
   \begin{itemize}
-    \item It causes make to construct an inaccurate DAG.\\[2mm]
-    \item It forces make to traverse the DAG in an inappropriate order.
+    \item It causes make to construct an inaccurate dependency tree.\\[2mm]
+    \item It forces make to traverse the tree in an inappropriate order.
   \end{itemize}
 \end{frame}
 
@@ -86,20 +236,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-  \frametitle{Nonrecursive Makefiles}
+  \frametitle{Using nonrecursive Makefiles}
   \begin{itemize}
-    \item The use of a whole project make is not as difficult to put into
+    \item<1-> The use of a whole project make is not as difficult to put into
       practice as it may at first appear.\\[5mm]
-    \item It solves the problems found in the recursive make approach.
+    \item<2-> It solves the problems found in the recursive make approach.
 
-      \begin{itemize}
+      \begin{itemize}[<3->]
       \item It handles dependencies correctly. Treating the whole tree as a
         single entity is really the right way.\\[1mm]
       \item Specific targets can be built (say a particular program)
         correctly, since make always creates a full dependency graph.\\[1mm]
       \item It is faster.\\[5mm]
       \end{itemize}
-    \item It requires a paradigm shift for developers used to recursive
+    \item<4> It requires a paradigm shift for developers used to recursive
       make.
   \end{itemize}
 \end{frame}
@@ -128,7 +278,7 @@
 
 \begin{frame}
   \frametitle{My approach for ClasTool}
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item I just took the old ClasTool Makefile and turned it into a
       nonrecursive Makefile.\\[4mm]
     \item My purpose was to eliminate the problems associated with using a
@@ -188,8 +338,8 @@
     lib_deps    :=
     extra_libs  :=
     extra_flags :=
-    
-    
+
+
     $(eval $(call make-module,$(module),$(lib_name),$(lib_deps)))
     $(eval $(call make-libs,$(module),$(lib_name),$(lib_deps),    \
                             $(local_class),$(local_files),        \
@@ -215,8 +365,8 @@
     lib_deps    := ClasBanks VirtualReader
     extra_libs  := -L$(ROOTLIBDIR) -lPhysics -lTree
     extra_flags := 
-    
-    
+
+
     $(eval $(call make-module,$(module),$(lib_name),$(lib_deps)))
     $(eval $(call make-libs,$(module),$(lib_name),$(lib_deps),    \
                             $(local_class),$(local_files),        \

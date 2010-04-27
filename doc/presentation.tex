@@ -19,6 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
 \begin{frame}
   \begin{center}
     \begin{tabular*}{\textwidth}%
@@ -101,11 +102,11 @@
   \frametitle{Makefiles and make command}
   \framesubtitle{Example}
 
-  The following tree shows the dependencies between files:
+  The dependencies between files are shown in the following tree:
 
   \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.6\textwidth]{depgraph}
+    \includegraphics[width=0.6\textwidth]{dep_graph}
   \end{figure}
 
 \end{frame}
@@ -130,7 +131,7 @@
             gcc -c data.c
 
     io.o: io.h io.c
-            cc -c io.c
+            gcc -c io.c
   \end{lstlisting}
 \end{frame}
 
@@ -141,7 +142,7 @@
   \framesubtitle{Example}
 
   \small{
-  \begin{itemize}[<+->]
+  \begin{itemize}
     \item \textbf{make} runs the rule for first target \texttt{project1} and
       figures its dependencies on \texttt{data.o}, \texttt{main.o} and
       \texttt{io.o}.
@@ -154,14 +155,15 @@
       \texttt{main.o} by compiling \texttt{main.c} to get the object file.
     \item \textbf{make} looks at the targets \texttt{data.o} and \texttt{io.o}
       and compiles these object files in a similar fashion.
-    \item \textbf{make} returns to first target \texttt{project1}. As it now
-      has all up-to-date object files for the rule, it executes the command to
-      build \texttt{project1}.
+    \item \textbf{make} returns to first target \texttt{project1}. Since it
+      now has all up-to-date object files for the rule, it executes the
+      command to build \texttt{project1}.
   \end{itemize}
   }
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
@@ -190,8 +192,9 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}
+\begin{frame}[label=issues]
   \frametitle{Recursive Makefile issues}
   Recursive makefiles are bad primarily because they partition the dependency
   tree into several trees.
@@ -203,7 +206,6 @@
       multiple times, which is a performance issue in the end.
   \end{itemize}
 
-  \pause
   \vspace{5mm}
   This affects both phases of the operation of make:
 
@@ -211,6 +213,9 @@
     \item It causes make to construct an inaccurate dependency tree.\\[2mm]
     \item It forces make to traverse the tree in an inappropriate order.
   \end{itemize}
+
+  \vspace{3mm}
+  \hyperlink{tree-problem}{\beamergotobutton{Simple example of dependency problem}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -233,7 +238,8 @@
   \end{itemize}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Using nonrecursive Makefiles}
@@ -267,13 +273,14 @@
       Makefile. By cleverly using the include mechanism the single Makefile
       solution is as modular as the recursive approach without the problems of
       incomplete dependency graphs.\\[5mm]
-    \item The single Makefile is fast
+    \item The single Makefile is fast.
       \begin{itemize}
         \item About 1 second to check if anything needs to be recompiled.
       \end{itemize}
   \end{itemize}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
@@ -288,9 +295,9 @@
         \item Because that is not the right way.\\[4mm]
       \end{itemize}
 
-    \item All the dictionary, objects and dependency files are created on its
-      source directory, so in the new approach this needs a serie of specific
-      rules for every directory.\\[4mm]
+    \item All the dictionary, objects and dependency files are created inside
+      of their source directory, so in the new approach this needs a series of
+      specific rules for every directory.\\[4mm]
     \item The automatic dependency generation was inefficient, and with a
       couple of issues. 
   \end{itemize}
@@ -349,7 +356,7 @@
 
   \pause
   For every directory the only thing that needs to be changed is the values of
-  the variables.
+  the variables. \texttt{\$(module)} is the name of the sub-directory.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -380,17 +387,20 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}
+\begin{frame}[label=eval]
   \frametitle{Implementation}
   \begin{itemize}
     \item The macros \texttt{make-module}, \texttt{make-libs} and
-      \texttt{make-objs} are defined in \texttt{Makefile\_templates}.\\[4mm]
+      \texttt{make-objs} are defined in \texttt{Makefile\_templates}.
+      \hyperlink{make-libs}{\beamergotobutton{Example of a macro
+      definition}}\\[4mm]
     \item By using the \texttt{eval} function, all the necessary rules are
       auto generated by make itself according to the above macros.\\[4mm]
     \item If some rules must be changed, this is done in one place:
       \texttt{Makefile\_templates}.\\[4mm]
     \item Auto-dependency generation is significantly improved using the
-      advanced method invented by Tom Tromey.
+      advanced method invented by Tom
+      Tromey\footnote{\url{http://make.paulandlesley.org/autodep.html}}.
   \end{itemize}
 \end{frame}
 
@@ -405,6 +415,7 @@
   \end{itemize}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]
@@ -422,6 +433,58 @@
   \end{thebibliography}
 \end{frame}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[label=tree-problem]
+  \frametitle{Recursive Makefile dependencies problem}
+
+  Suppose \textbf{make} is called first for \texttt{ModuleA} and then for
+  \texttt{ModuleB}.
+
+  \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.5\textwidth]{dep_problem}
+  \end{figure}
+
+
+  What happens if we modified file \texttt{C2} and we call \textbf{make}
+  command?
+
+  \vspace{3mm}
+  \hyperlink{issues}{\beamerreturnbutton{Back}}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile,label=make-libs]
+  \frametitle{Example: make-libs macro}
+
+  \begin{lstlisting}[language=make]
+  define make-libs
+  SOURCES_DEPS += $(call dep-list,$(1),$(4) $(5))
+  SOURCES_DICTS += $(call dict-list,$(1),$(4))
+
+  $(SLIBDIR)/lib$(2).$(DllSuf): $(call obj-list,$(1),$(4) $(5))  \
+                                $(call dict-obj-list,$(1),$(4))
+          @echo CREATING SHARED LIBRARY $$@
+  ifeq (,$(7))
+          $(LD) $(SOFLAGS) $(LDFLAGS) -o $$@       \
+          $$^ $(6) $(if $3,-L$(SLIBDIR) $(addprefix -l,$3))
+  else
+          $(7) $(SOFLAGS) $(LDFLAGS) -o $$@        \
+          $$^ $(6) $(if $3,-L$(SLIBDIR) $(addprefix -l,$3))
+  endif
+          $(POST_LINK_COMMAND)
+
+  $(LIBDIR)/lib$(2).a: $(call obj-list,$(1),$(4) $(5))           \
+                       $(call dict-obj-list,$(1),$(4))
+          @echo CREATING LIBRARY $$@
+          ar r $$@ $$^
+  endef
+  \end{lstlisting}
+  \hyperlink{eval}{\beamerreturnbutton{Back}}
+\end{frame}
 
 \end{document}

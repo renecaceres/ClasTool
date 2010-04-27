@@ -40,11 +40,11 @@ endef
 
 all: 	pdf
 
-%.d	: %.tex
+%.dep	: %.tex
 	@$(DEPENDENCIES) ; \
 	echo "$*.pdf : $< $$DEPFILES" > $@ 
 	
--include $(LATEXFILES:.tex=.d)
+-include $(LATEXFILES:.tex=.dep)
 
 pdf: 	$(PDFFILES)
 
@@ -55,4 +55,4 @@ clean: aux
 	rm -f $(PDFFILES)
 
 aux:
-	rm -f *.{aux,log,dvi,nav,out,snm,toc,lof,toc,d}
+	rm -f *.{aux,log,dvi,nav,out,snm,vrb,toc,lof,toc,dep}

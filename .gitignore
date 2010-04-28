@@ -10,3 +10,4 @@ bin
 slib
 lib
 *.gif
+include
